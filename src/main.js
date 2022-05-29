@@ -1,10 +1,19 @@
 const express = require('express');
+const faker = require('faker');
+const normalizr = require('normalizr');
+const normalize = normalizr.normalize;
+const denormalize = normalizr.denormalize;
+const schema = normalizr.schema;
+const print = require('./tools');
 
 const { Server: HttpServer } = require('http');
 const { Server: Socket } = require('socket.io');
 
 const ContenedorSQL = require('./contenedores/ContenedorSQL.js');
+const ContenedorFirebase = require('./contenedores/ContenedorFirebase');
 const config = require('./config.js');
+
+faker.locale = 'es';
 
 //--------------------------------------------
 // instancio servidor, socket y api
@@ -14,17 +23,26 @@ const httpServer = new HttpServer(app);
 const io = new Socket(httpServer);
 
 const productosApi = new ContenedorSQL(config.mariaDb, 'productos');
-const mensajesApi = new ContenedorSQL(config.sqlite3, 'mensajes');
+const mensajesApi = new ContenedorFirebase('mensajes');
 
 //--------------------------------------------
 // NORMALIZACIÓN DE MENSAJES
-
+const idSchema = new schema.Entity('ids');
+const textSchema = new schema.Entity('texts');
+const dateSchema = new schema.Entity('dates');
 // Definimos un esquema de autor
-
+const authorSchema = new schema.Entity('authors', {}, { idAttribute: 'mail' });
 // Definimos un esquema de mensaje
-
+const mensajeSchema = new schema.Entity('mensajes', {
+  id: idSchema,
+  text: [textSchema],
+  authors: [authorSchema],
+  date: dateSchema,
+});
 // Definimos un esquema de posts
-
+const postSchema = new schema.Entity('posts', {
+  posts: [mensajeSchema],
+});
 //--------------------------------------------
 // configuro el socket
 
@@ -45,14 +63,16 @@ io.on('connection', async (socket) => {
 
   // carga inicial de mensajes
   const mensajes = await mensajesApi.listarAll();
-  socket.emit('mensajes', mensajes);
+  console.log(mensajes);
+  const mensajesN = normalize(mensajes, [postSchema]);
+  print(mensajesN);
+  socket.emit('mensajes', mensajesN);
   // actualizacion de mensajes
   socket.on('addMessage', async (newMessage) => {
-    console.log(newMessage);
     const _ = await mensajesApi.guardar(newMessage);
     const mensajes = await mensajesApi.listarAll();
-    console.log(mensajes);
-    io.sockets.emit('mensajes', mensajes);
+    const messagesN = normalize(mensajes, postSchema);
+    io.sockets.emit('mensajes', messagesN);
   });
 });
 
@@ -64,7 +84,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 //--------------------------------------------
 
-app.get('/api/productos-test', (req, res) => {});
+app.get('/api/productos-test', (req, res) => {
+  productos = [];
+  for (i = 0; i < 5; i++) {
+    productos.push({
+      name: faker.commerce.product(),
+      price: faker.commerce.price(),
+      photo: faker.image.imageUrl(),
+    });
+  }
+  res.send(productos);
+});
 
 //--------------------------------------------
 // inicio el servidor

@@ -9,12 +9,20 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "-": "^0.0.1",
     "express": "^4.17.3",
     "express-handlebars": "^5.2.0",
+    "faker": "^5.5.3",
+    "firebase-admin": "^7.0.0",
     "knex": "^2.0.0",
     "mysql": "^2.18.1",
+    "nodemon": "^2.0.16",
+    "normalizr": "^3.6.2",
     "socket.io": "^4.4.1",
     "sqlite3": "^5.0.6"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/faker": "^6.6.9"
+  }
 }

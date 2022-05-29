@@ -10,6 +10,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+  
+<script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.2/dist/normalizr.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <link
       rel="stylesheet"
@@ -66,15 +68,51 @@
       </div>
 
       <div class="jumbotron">
-        <h1>Centro de Mensajes</h1>
+        <h1>Centro de Mensajes (Compresión: <span id="compresion-info"></span>%)</h1>
+
         <br />
 
         <input
-          id="inputUsername"
+          id="inputMail"
           class="form-control w-50 my-2 mr-2"
           placeholder="Ingresá tu email"
           type="email"
           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+        />
+
+        <input
+          id="inputUsername"
+          class="form-control w-50 my-2 mr-2"
+          placeholder="Ingresá tu nombre"
+          type="text"
+        />
+
+        <input
+          id="inputLastname"
+          class="form-control w-50 my-2 mr-2"
+          placeholder="Ingresá tu apellido"
+          type="text"
+        />
+
+        <input
+          id="inputAge"
+          class="form-control w-50 my-2 mr-2"
+          placeholder="Ingresá tu edad"
+          type="number"
+        />
+
+        <input
+          id="inputAlias"
+          class="form-control w-50 my-2 mr-2"
+          placeholder="Ingresá tu alias"
+          type="text"
+        />
+
+        <input
+          id="inputAvatar"
+          class="form-control w-50 my-2 mr-2"
+          placeholder="Ingresá tu avatar"
+          type="text"
         />
 
         <hr />
